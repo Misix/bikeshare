@@ -19,7 +19,7 @@ DATE="$(date "+%Y-%m-%d")"
 TIMESTAMP="$(date "+%s")"
 
 # This is where the resulting data will be stored.
-DATA_DIR="./data"
+DATA_DIR="./data/$DATE/$TIMESTAMP"
 mkdir -p "$DATA_DIR"
 
 # Check the requirements
@@ -58,11 +58,6 @@ do
   scrape_dir="$feed_dir/$DATE/$TIMESTAMP"
   mkdir -p "$scrape_dir"
   
-  # Assign this directory as the 'lastest' version through a softlink
-  # for convenience.
-  rm -f "$feed_dir/latest"
-  ln -s "$DATE/$TIMESTAMP" "$feed_dir/latest"
-  
   # Dump the primary link file
   cd "$scrape_dir" && {
     curl --silent -O "$feed"
@@ -79,3 +74,7 @@ do
     cd -
   } > /dev/null
 done
+
+# Tar and compress everything.
+tar -C "$DATA_DIR" -jcf "$DATA_DIR.tar.bz2" ./
+rm -r "$DATA_DIR"
